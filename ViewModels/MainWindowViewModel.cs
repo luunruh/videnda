@@ -374,6 +374,100 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
+
+    // ==================== EDIT-MODAL ====================
+
+    [ObservableProperty]
+    public partial bool ShowEdit { get; set; }
+
+    [ObservableProperty]
+    public partial string EditName { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string EditYear { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string EditRating { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string EditGenres { get; set; } = string.Empty;
+
+    [RelayCommand]
+    private void OpenEdit()
+    {
+        if (GridSelection is null) return;
+
+        var m = GridSelection.Model;
+        EditName = m.Name;
+        EditYear = m.Year?.ToString() ?? string.Empty;
+        EditRating = m.Rating?.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
+        EditGenres = string.Join(", ", m.Genres.Select(g => g.Name));
+        ShowEdit = true;
+    }
+
+    [RelayCommand]
+    private void CloseEdit() => ShowEdit = false;
+
+    [RelayCommand]
+    private void SubmitEdit()
+    {
+        if (GridSelection is null) return;
+        if (string.IsNullOrWhiteSpace(EditName)) return;
+
+        // Jahr parsen (optional)
+        int? year = int.TryParse(EditYear, out var y) ? y : null;
+
+        // Rating parsen (optional), Komma wie Punkt akzeptieren, auf 0–10 begrenzen
+        double? rating = null;
+        var ratingText = EditRating.Replace(',', '.');
+        if (double.TryParse(ratingText, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var r))
+            rating = Math.Clamp(r, 0, 10);
+
+        var genreNames = EditGenres
+            .Split(',')
+            .Select(g => g.Trim())
+            .Where(g => g.Length > 0)
+            .ToList();
+
+        var model = GridSelection.Model;
+
+        using (var db = new VidendaContext())
+        {
+            var dbTitle = db.Titles
+                .Include(t => t.Genres)
+                .FirstOrDefault(t => t.Id == model.Id);
+            if (dbTitle is null) return;
+
+            dbTitle.Name = EditName.Trim();
+            dbTitle.Year = year;
+            dbTitle.Rating = rating;
+
+            // Genres komplett ersetzen: vorhandene wiederverwenden, neue anlegen
+            dbTitle.Genres.Clear();
+            foreach (var name in genreNames)
+            {
+                var genre = db.Genres.FirstOrDefault(g => g.Name == name)
+                            ?? new Genre { Name = name };
+                dbTitle.Genres.Add(genre);
+            }
+
+            db.SaveChanges();
+
+            // In-Memory-Model angleichen
+            model.Name = dbTitle.Name;
+            model.Year = dbTitle.Year;
+            model.Rating = dbTitle.Rating;
+            model.Genres = dbTitle.Genres.ToList();
+        }
+
+        GridSelection.NotifyEdited();
+
+        ShowEdit = false;
+        RebuildGenreOptions();
+        Refresh();
+    }
+
     // ==================== DATEN LADEN / FILTERN ====================
 
     private void LoadFromDb()

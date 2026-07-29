@@ -47,6 +47,18 @@ public partial class TitleViewModel : ViewModelBase
 
     public bool HasCover => Cover is not null;
 
+
+    // Nach einem Edit aufrufen: meldet alle aus dem Model berechneten Werte neu
+    public void NotifyEdited()
+    {
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(Year));
+        OnPropertyChanged(nameof(RatingText));
+        OnPropertyChanged(nameof(RatingBarWidth));
+        OnPropertyChanged(nameof(Genres));
+        OnPropertyChanged(nameof(PosterBrush));
+    }
+
     // --- Typ-Anzeige ---
     public string TypeLabel => Model.Type == TitleType.Tv ? "TV" : "FILM";
     public string TypeFull => Model.Type == TitleType.Tv ? "TV Series" : "Movie";

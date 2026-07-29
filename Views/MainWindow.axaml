@@ -337,6 +337,8 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="8">
+                        <Button Classes="ghost" Command="{Binding OpenEditCommand}" Content="Edit"
+                                HorizontalAlignment="Right" />
                         <Border Background="{DynamicResource Surface2Brush}" CornerRadius="9" Padding="3">
                             <StackPanel Orientation="Horizontal" Spacing="2">
                                 <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsWatched}"
@@ -445,6 +447,42 @@
                         <Button Classes="ghost" Command="{Binding CloseImportCommand}" Content="Cancel"
                                 IsEnabled="{Binding !IsImporting}" />
                         <Button Classes="primary" Command="{Binding SubmitImportCommand}" Content="Import" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#99000000" IsVisible="{Binding ShowEdit}">
+            <Border Width="420" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14"
+                    Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Edit title" FontSize="18" FontWeight="Bold" />
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Name" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBox Classes="field" Text="{Binding EditName}" />
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,12,0">
+                            <TextBlock Text="Year" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                            <TextBox Classes="field" PlaceholderText="e.g. 2022" Text="{Binding EditYear}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Width="110" Spacing="6">
+                            <TextBlock Text="Rating" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                            <TextBox Classes="field" PlaceholderText="0–10" Text="{Binding EditRating}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Genres (comma separated)" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBox Classes="field" PlaceholderText="Drama, Thriller" Text="{Binding EditGenres}" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,6,0,0">
+                        <Button Classes="ghost" Command="{Binding CloseEditCommand}" Content="Cancel" />
+                        <Button Classes="primary" Command="{Binding SubmitEditCommand}" Content="Save" />
                     </StackPanel>
                 </StackPanel>
             </Border>
