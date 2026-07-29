@@ -156,7 +156,7 @@
             <StackPanel>
 
                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="28,16">
-                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
 
                         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                             <Border Width="9" Height="9" CornerRadius="2" Background="{DynamicResource AccentBrush}" />
@@ -183,7 +183,10 @@
                             </StackPanel>
                         </Border>
 
-                        <Button Grid.Column="3" Classes="primary" Command="{Binding OpenAddCommand}"
+                        <Button Grid.Column="3" Classes="ghost" Command="{Binding OpenImportCommand}"
+                                Margin="0,0,10,0" VerticalAlignment="Center" Content="Import" />
+
+                        <Button Grid.Column="4" Classes="primary" Command="{Binding OpenAddCommand}"
                                 VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Spacing="7">
                                 <TextBlock Text="+" FontSize="16" />
@@ -191,7 +194,7 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="4" Classes="themeToggle" Classes.light="{Binding IsLightTheme}"
+                        <Button Grid.Column="5" Classes="themeToggle" Classes.light="{Binding IsLightTheme}"
                                 Command="{Binding ToggleThemeCommand}" Width="46" Height="26"
                                 Margin="14,0,0,0" VerticalAlignment="Center">
                             <Border Name="Knob" Width="20" Height="20" CornerRadius="10"
@@ -239,6 +242,8 @@
                     <DataTemplate x:DataType="vm:TitleViewModel">
                         <Border Background="{Binding PosterBrush}" CornerRadius="12" ClipToBounds="True">
                             <Panel>
+                                <Image Source="{Binding Cover}" Stretch="UniformToFill"
+                                       IsVisible="{Binding HasCover}" />
                                 <Border Background="#8C000000" CornerRadius="5" Padding="7,3"
                                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
                                     <TextBlock Text="{Binding TypeLabel}" Foreground="White"
@@ -280,11 +285,15 @@
 
                     <Border Grid.Column="0" Width="104" Height="154" CornerRadius="10" ClipToBounds="True"
                             Background="{Binding SelectedTitle.PosterBrush}" VerticalAlignment="Center">
-                        <Border Background="#8C000000" CornerRadius="4" Padding="6,2"
-                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6">
-                            <TextBlock Text="{Binding SelectedTitle.TypeLabel}" Foreground="White"
-                                       FontSize="8.5" FontWeight="Bold" />
-                        </Border>
+                        <Panel>
+                            <Image Source="{Binding SelectedTitle.Cover}" Stretch="UniformToFill"
+                                   IsVisible="{Binding SelectedTitle.HasCover}" />
+                            <Border Background="#8C000000" CornerRadius="4" Padding="6,2"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6">
+                                <TextBlock Text="{Binding SelectedTitle.TypeLabel}" Foreground="White"
+                                           FontSize="8.5" FontWeight="Bold" />
+                            </Border>
+                        </Panel>
                     </Border>
 
                     <StackPanel Grid.Column="1" Margin="26,0" VerticalAlignment="Center" Spacing="10">
@@ -395,6 +404,46 @@
                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,6,0,0">
                         <Button Classes="ghost" Command="{Binding CloseAddCommand}" Content="Cancel" />
                         <Button Classes="primary" Command="{Binding SubmitAddCommand}" Content="Add to library" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#99000000" IsVisible="{Binding ShowImport}">
+            <Border Width="420" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14"
+                    Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Import from IMDb" FontSize="18" FontWeight="Bold" />
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="IMDb link or ID" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBox Classes="field" PlaceholderText="https://www.imdb.com/title/tt10223460/"
+                                 Text="{Binding ImportLink}" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Status" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <Border Background="{DynamicResource Surface2Brush}" CornerRadius="8" Padding="3">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Classes="seg" Classes.active="{Binding IsImportWatched}"
+                                        Command="{Binding SetImportStatusCommand}" CommandParameter="watched" Content="Watched" />
+                                <Button Classes="seg" Classes.active="{Binding IsImportPlanned}"
+                                        Command="{Binding SetImportStatusCommand}" CommandParameter="planned" Content="Planned" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding ImportError}" IsVisible="{Binding HasImportError}"
+                               Foreground="#E5484D" FontSize="12" TextWrapping="Wrap" />
+
+                    <TextBlock Text="Importing…" IsVisible="{Binding IsImporting}"
+                               Foreground="{DynamicResource TextMutedBrush}" FontSize="12" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,6,0,0">
+                        <Button Classes="ghost" Command="{Binding CloseImportCommand}" Content="Cancel"
+                                IsEnabled="{Binding !IsImporting}" />
+                        <Button Classes="primary" Command="{Binding SubmitImportCommand}" Content="Import" />
                     </StackPanel>
                 </StackPanel>
             </Border>

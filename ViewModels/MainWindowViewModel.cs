@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
 using Videnda.Data;
 using Videnda.Models;
+using Videnda.Services;
 
 namespace Videnda.ViewModels;
 
@@ -23,6 +25,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        if (Avalonia.Controls.Design.IsDesignMode)
+            return;
+
         LoadFromDb();
         Refresh();
     }
@@ -249,6 +254,124 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentTab = title.Status == WatchStatus.Watched ? "watched" : "planned";
         Refresh();
         GridSelection = FilteredTitles.FirstOrDefault(t => t.Model.Id == title.Id);
+    }
+
+
+    // ==================== IMPORT-MODAL (OMDb) ====================
+
+    [ObservableProperty]
+    public partial bool ShowImport { get; set; }
+
+    [ObservableProperty]
+    public partial string ImportLink { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string ImportStatus { get; set; } = "planned";
+
+    [ObservableProperty]
+    public partial bool IsImporting { get; set; }
+
+    [ObservableProperty]
+    public partial string? ImportError { get; set; }
+
+    public bool IsImportWatched => ImportStatus == "watched";
+    public bool IsImportPlanned => ImportStatus == "planned";
+    public bool HasImportError => !string.IsNullOrEmpty(ImportError);
+
+    partial void OnImportStatusChanged(string value)
+    {
+        OnPropertyChanged(nameof(IsImportWatched));
+        OnPropertyChanged(nameof(IsImportPlanned));
+    }
+
+    partial void OnImportErrorChanged(string? value) => OnPropertyChanged(nameof(HasImportError));
+
+    [RelayCommand]
+    private void OpenImport()
+    {
+        ImportLink = string.Empty;
+        ImportStatus = "planned";
+        ImportError = null;
+        ShowImport = true;
+    }
+
+    [RelayCommand]
+    private void CloseImport() => ShowImport = false;
+
+    [RelayCommand]
+    private void SetImportStatus(string s) => ImportStatus = s;
+
+    [RelayCommand]
+    private async Task SubmitImportAsync()
+    {
+        ImportError = null;
+
+        var imdbId = MetadataService.ExtractImdbId(ImportLink);
+        if (imdbId is null)
+        {
+            ImportError = "No IMDb ID found in that link.";
+            return;
+        }
+
+        IsImporting = true;
+        try
+        {
+            var meta = await MetadataService.FetchAsync(imdbId);
+            if (meta is null)
+            {
+                ImportError = "Title not found on OMDb.";
+                return;
+            }
+
+            var coverPath = await MetadataService.DownloadPosterAsync(meta.Poster, imdbId);
+
+            var genreNames = (meta.Genre ?? string.Empty)
+                .Split(',')
+                .Select(g => g.Trim())
+                .Where(g => g.Length > 0)
+                .ToList();
+
+            var title = new Title
+            {
+                Name = meta.Title ?? imdbId,
+                Year = MetadataService.ParseYear(meta.Year),
+                Type = meta.Type == "series" ? TitleType.Tv : TitleType.Movie,
+                Status = ImportStatus == "watched" ? WatchStatus.Watched : WatchStatus.Planned,
+                CoverPath = coverPath
+            };
+
+            using (var db = new VidendaContext())
+            {
+                foreach (var name in genreNames)
+                {
+                    var genre = db.Genres.FirstOrDefault(g => g.Name == name)
+                                ?? new Genre { Name = name };
+                    title.Genres.Add(genre);
+                }
+
+                db.Titles.Add(title);
+                db.SaveChanges();
+            }
+
+            _all.Add(new TitleViewModel(title));
+
+            ShowImport = false;
+            RebuildGenreOptions();
+            OnPropertyChanged(nameof(WatchedCount));
+            OnPropertyChanged(nameof(PlannedCount));
+
+            CurrentTab = title.Status == WatchStatus.Watched ? "watched" : "planned";
+            Refresh();
+            GridSelection = FilteredTitles.FirstOrDefault(t => t.Model.Id == title.Id);
+        }
+        catch (Exception ex)
+        {
+            ImportError = $"Import failed: {ex.Message}";
+        }
+        finally
+        {
+            IsImporting = false;
+        }
     }
 
     // ==================== DATEN LADEN / FILTERN ====================

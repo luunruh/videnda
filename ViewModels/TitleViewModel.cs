@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Videnda.Models;
 
@@ -25,6 +27,25 @@ public partial class TitleViewModel : ViewModelBase
     // Status ist observable, weil er sich zur Laufzeit ändert (Watched/Planned-Umschalten)
     [ObservableProperty]
     public partial WatchStatus Status { get; set; }
+
+
+    // --- Echtes Cover (lazy geladen und gecacht), null wenn keins existiert ---
+    private Bitmap? _cover;
+    public Bitmap? Cover
+    {
+        get
+        {
+            if (_cover is null
+                && !string.IsNullOrWhiteSpace(Model.CoverPath)
+                && File.Exists(Model.CoverPath))
+            {
+                _cover = new Bitmap(Model.CoverPath);
+            }
+            return _cover;
+        }
+    }
+
+    public bool HasCover => Cover is not null;
 
     // --- Typ-Anzeige ---
     public string TypeLabel => Model.Type == TitleType.Tv ? "TV" : "FILM";

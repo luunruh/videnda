@@ -1,10 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Videnda.Data;
-using Videnda.Services;
 using Videnda.ViewModels;
 using Videnda.Views;
 
@@ -21,7 +18,7 @@ public partial class App : Application
     {
         using (var db = new VidendaContext())
             db.Database.EnsureCreated();
-        
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
