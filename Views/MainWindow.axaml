@@ -270,76 +270,79 @@
 
         <Border Grid.Row="2" Height="190" Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="28,18">
+            <Panel>
 
-            <TextBlock Text="Select a title to see details" IsVisible="{Binding !HasSelection}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Foreground="{DynamicResource TextFaintBrush}" FontSize="13.5" />
+                <TextBlock Text="Select a title to see details" IsVisible="{Binding !HasSelection}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextFaintBrush}" FontSize="13.5" />
 
-            <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding HasSelection}">
+                <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding HasSelection}">
 
-                <Border Grid.Column="0" Width="104" Height="154" CornerRadius="10" ClipToBounds="True"
-                        Background="{Binding SelectedTitle.PosterBrush}" VerticalAlignment="Center">
-                    <Border Background="#8C000000" CornerRadius="4" Padding="6,2"
-                            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6">
-                        <TextBlock Text="{Binding SelectedTitle.TypeLabel}" Foreground="White"
-                                   FontSize="8.5" FontWeight="Bold" />
-                    </Border>
-                </Border>
-
-                <StackPanel Grid.Column="1" Margin="26,0" VerticalAlignment="Center" Spacing="10">
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="{Binding SelectedTitle.Name}" FontSize="22" FontWeight="Bold" />
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="{Binding SelectedTitle.Year}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
-                            <TextBlock Text="·" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
-                            <TextBlock Text="{Binding SelectedTitle.TypeFull}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding SelectedTitle.RatingText}" FontSize="26" FontWeight="Bold"
-                                   Foreground="{DynamicResource AccentBrush}" />
-                        <TextBlock Text="/ 10.0" FontSize="13" Foreground="{DynamicResource TextFaintBrush}"
-                                   VerticalAlignment="Bottom" Margin="0,0,0,4" />
-                        <Border Width="120" Height="5" CornerRadius="3" Margin="8,0,0,0"
-                                Background="{DynamicResource Surface2Brush}" ClipToBounds="True" VerticalAlignment="Center">
-                            <Border HorizontalAlignment="Left" Width="{Binding SelectedTitle.RatingBarWidth}"
-                                    CornerRadius="3" Background="{DynamicResource AccentBrush}" />
+                    <Border Grid.Column="0" Width="104" Height="154" CornerRadius="10" ClipToBounds="True"
+                            Background="{Binding SelectedTitle.PosterBrush}" VerticalAlignment="Center">
+                        <Border Background="#8C000000" CornerRadius="4" Padding="6,2"
+                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6">
+                            <TextBlock Text="{Binding SelectedTitle.TypeLabel}" Foreground="White"
+                                       FontSize="8.5" FontWeight="Bold" />
                         </Border>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="26,0" VerticalAlignment="Center" Spacing="10">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="{Binding SelectedTitle.Name}" FontSize="22" FontWeight="Bold" />
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="{Binding SelectedTitle.Year}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
+                                <TextBlock Text="·" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
+                                <TextBlock Text="{Binding SelectedTitle.TypeFull}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding SelectedTitle.RatingText}" FontSize="26" FontWeight="Bold"
+                                       Foreground="{DynamicResource AccentBrush}" />
+                            <TextBlock Text="/ 10.0" FontSize="13" Foreground="{DynamicResource TextFaintBrush}"
+                                       VerticalAlignment="Bottom" Margin="0,0,0,4" />
+                            <Border Width="120" Height="5" CornerRadius="3" Margin="8,0,0,0"
+                                    Background="{DynamicResource Surface2Brush}" ClipToBounds="True" VerticalAlignment="Center">
+                                <Border HorizontalAlignment="Left" Width="{Binding SelectedTitle.RatingBarWidth}"
+                                        CornerRadius="3" Background="{DynamicResource AccentBrush}" />
+                            </Border>
+                        </StackPanel>
+
+                        <ItemsControl ItemsSource="{Binding SelectedTitle.Genres}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Classes="chip" Margin="0,0,8,0">
+                                        <TextBlock Text="{Binding}" Foreground="{DynamicResource TextMutedBrush}"
+                                                   FontSize="11.5" FontWeight="Medium" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
 
-                    <ItemsControl ItemsSource="{Binding SelectedTitle.Genres}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Classes="chip" Margin="0,0,8,0">
-                                    <TextBlock Text="{Binding}" Foreground="{DynamicResource TextMutedBrush}"
-                                               FontSize="11.5" FontWeight="Medium" />
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="8">
+                        <Border Background="{DynamicResource Surface2Brush}" CornerRadius="9" Padding="3">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsWatched}"
+                                        Command="{Binding SetStatusCommand}" CommandParameter="watched" Content="Watched" />
+                                <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsPlanned}"
+                                        Command="{Binding SetStatusCommand}" CommandParameter="planned" Content="Planned" />
+                                <Button Classes="seg" IsEnabled="False" Opacity="0.5" Content="Dropped"
+                                        ToolTip.Tip="Coming soon" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="Dropped status — coming soon" HorizontalAlignment="Right"
+                                   Foreground="{DynamicResource TextFaintBrush}" FontSize="11" />
+                    </StackPanel>
+                </Grid>
 
-                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="8">
-                    <Border Background="{DynamicResource Surface2Brush}" CornerRadius="9" Padding="3">
-                        <StackPanel Orientation="Horizontal" Spacing="2">
-                            <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsWatched}"
-                                    Command="{Binding SetStatusCommand}" CommandParameter="watched" Content="Watched" />
-                            <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsPlanned}"
-                                    Command="{Binding SetStatusCommand}" CommandParameter="planned" Content="Planned" />
-                            <Button Classes="seg" IsEnabled="False" Opacity="0.5" Content="Dropped"
-                                    ToolTip.Tip="Coming soon" />
-                        </StackPanel>
-                    </Border>
-                    <TextBlock Text="Dropped status — coming soon" HorizontalAlignment="Right"
-                               Foreground="{DynamicResource TextFaintBrush}" FontSize="11" />
-                </StackPanel>
-            </Grid>
+            </Panel>
         </Border>
 
         <Border Grid.Row="0" Grid.RowSpan="3" Background="#99000000" IsVisible="{Binding ShowAdd}">

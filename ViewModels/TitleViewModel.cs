@@ -15,7 +15,7 @@ public partial class TitleViewModel : ViewModelBase
     public TitleViewModel(Title model)
     {
         Model = model;
-        _status = model.Status;
+        Status = model.Status;
     }
 
     // --- Direkte Durchreichungen ---

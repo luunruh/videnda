@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -86,6 +87,14 @@ public partial class MainWindowViewModel : ViewModelBase
     // --- Theme ---
     [ObservableProperty]
     public partial bool IsLightTheme { get; set; }
+
+    partial void OnIsLightThemeChanged(bool value)
+    {
+        if (Avalonia.Application.Current is { } app)
+            app.RequestedThemeVariant = value
+                ? Avalonia.Styling.ThemeVariant.Light
+                : Avalonia.Styling.ThemeVariant.Dark;
+    }
 
     // ==================== ZÄHLER & LABELS ====================
 
@@ -253,4 +262,59 @@ public partial class MainWindowViewModel : ViewModelBase
             .ToList();
 
         _all.Clear();
-        foreach (var t in
+        foreach (var t in titles)
+            _all.Add(new TitleViewModel(t));
+
+        RebuildGenreOptions();
+    }
+
+    private void RebuildGenreOptions()
+    {
+        var selected = GenreFilter;
+
+        GenreOptions.Clear();
+        GenreOptions.Add("All genres");
+        foreach (var name in _all
+                     .SelectMany(t => t.Genres)
+                     .Distinct()
+                     .OrderBy(n => n))
+        {
+            GenreOptions.Add(name);
+        }
+
+        // Auswahl behalten, falls das Genre noch existiert
+        GenreFilter = GenreOptions.Contains(selected) ? selected : "All genres";
+    }
+
+    private void Refresh()
+    {
+        var wanted = CurrentTab == "watched" ? WatchStatus.Watched : WatchStatus.Planned;
+
+        IEnumerable<TitleViewModel> result = _all.Where(t => t.Status == wanted);
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            result = result.Where(t =>
+                t.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
+
+        if (GenreFilter != "All genres")
+            result = result.Where(t => t.Genres.Contains(GenreFilter));
+
+        result = CurrentSort switch
+        {
+            "name"   => result.OrderBy(t => t.Name),
+            "recent" => result.OrderByDescending(t => t.Model.DateAdded),
+            _        => result.OrderByDescending(t => t.Model.Rating ?? -1)
+        };
+
+        FilteredTitles.Clear();
+        foreach (var t in result)
+            FilteredTitles.Add(t);
+
+        OnPropertyChanged(nameof(NoResults));
+        OnPropertyChanged(nameof(ResultCountLabel));
+
+        // Auswahl aufheben, wenn sie aus der Liste gefiltert wurde
+        if (GridSelection is not null && !FilteredTitles.Contains(GridSelection))
+            GridSelection = null;
+    }
+}
