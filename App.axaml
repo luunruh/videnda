@@ -2,12 +2,45 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Videnda.App"
              xmlns:local="using:Videnda"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             RequestedThemeVariant="Dark">
 
     <Application.DataTemplates>
         <local:ViewLocator />
     </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+
+                <!-- ==================== DARK ==================== -->
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="BgBrush"        Color="#0F0F12" />
+                    <SolidColorBrush x:Key="SurfaceBrush"   Color="#17171B" />
+                    <SolidColorBrush x:Key="Surface2Brush"  Color="#212127" />
+                    <SolidColorBrush x:Key="BorderBrush"    Color="#2C2C33" />
+                    <SolidColorBrush x:Key="TextBrush"      Color="#F2F2F5" />
+                    <SolidColorBrush x:Key="TextMutedBrush" Color="#A8A8B3" />
+                    <SolidColorBrush x:Key="TextFaintBrush" Color="#6C6C77" />
+                    <SolidColorBrush x:Key="AccentBrush"    Color="#6C8CFF" />
+                    <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
+                </ResourceDictionary>
+
+                <!-- ==================== LIGHT ==================== -->
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="BgBrush"        Color="#F4F4F7" />
+                    <SolidColorBrush x:Key="SurfaceBrush"   Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="Surface2Brush"  Color="#ECECF1" />
+                    <SolidColorBrush x:Key="BorderBrush"    Color="#DADAE2" />
+                    <SolidColorBrush x:Key="TextBrush"      Color="#16161A" />
+                    <SolidColorBrush x:Key="TextMutedBrush" Color="#55555F" />
+                    <SolidColorBrush x:Key="TextFaintBrush" Color="#9A9AA4" />
+                    <SolidColorBrush x:Key="AccentBrush"    Color="#4C6EF5" />
+                    <SolidColorBrush x:Key="AccentTextBrush" Color="#FFFFFF" />
+                </ResourceDictionary>
+
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />

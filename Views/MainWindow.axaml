@@ -1,22 +1,400 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Videnda.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="clr-namespace:Videnda.ViewModels"
+        xmlns:models="clr-namespace:Videnda.Models"
+        mc:Ignorable="d"
         x:Class="Videnda.Views.MainWindow"
-        x:DataType="vm:MainViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="Videnda">
+        x:DataType="vm:MainWindowViewModel"
+        Title="Videnda"
+        Width="1200" Height="820"
+        MinWidth="900" MinHeight="640"
+        FontFamily="{StaticResource ContentControlThemeFontFamily}"
+        Background="{DynamicResource BgBrush}"
+        Foreground="{DynamicResource TextBrush}">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center" />
+    <Window.Styles>
 
+        <Style Selector="Button.seg">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.seg:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextBrush}" />
+        </Style>
+        <Style Selector="Button.seg.active">
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+        <Style Selector="Button.seg.active /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        <Style Selector="Button.seg.active:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentTextBrush}" />
+        </Style>
+
+        <Style Selector="Button.ghost">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.ghost:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+        </Style>
+
+        <Style Selector="Button.themeToggle">
+            <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="13" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+        <Style Selector="Button.themeToggle:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+        </Style>
+        <Style Selector="Button.themeToggle Border#Knob">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Margin" Value="3,0,0,0" />
+        </Style>
+        <Style Selector="Button.themeToggle.light Border#Knob">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Margin" Value="0,0,3,0" />
+        </Style>
+
+        <Style Selector="TextBox.field">
+            <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+
+        <Style Selector="ListBox.tiles">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="26" />
+        </Style>
+        <Style Selector="ListBox.tiles ListBoxItem">
+            <Setter Property="Margin" Value="9" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Width" Value="150" />
+            <Setter Property="Height" Value="225" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="RenderTransform" Value="none" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.22" Easing="CubicEaseOut" />
+                </Transitions>
+            </Setter>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel>
+                        <Border Name="Card" CornerRadius="12" ClipToBounds="True" Background="Transparent"
+                                BoxShadow="0 2 10 0 #59000000">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        </Border>
+                        <Border Name="SelRing" CornerRadius="12" BorderThickness="2.5"
+                                BorderBrush="{DynamicResource AccentBrush}" IsVisible="False" />
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ListBox.tiles ListBoxItem:pointerover">
+            <Setter Property="RenderTransform" Value="scale(1.07)" />
+            <Setter Property="ZIndex" Value="10" />
+        </Style>
+        <Style Selector="ListBox.tiles ListBoxItem:pointerover /template/ Border#Card">
+            <Setter Property="BoxShadow" Value="0 16 32 0 #80000000" />
+        </Style>
+        <Style Selector="ListBox.tiles ListBoxItem:selected /template/ Border#SelRing">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+
+        <Style Selector="Border.chip">
+            <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,4" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <Border Grid.Row="0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+            <StackPanel>
+
+                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="28,16">
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Border Width="9" Height="9" CornerRadius="2" Background="{DynamicResource AccentBrush}" />
+                            <TextBlock Text="Videnda" FontSize="19" FontWeight="Bold" />
+                        </StackPanel>
+
+                        <Border Grid.Column="1" Margin="22,0,0,0" Background="{DynamicResource Surface2Brush}"
+                                CornerRadius="10" Padding="4" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Classes="seg" Classes.active="{Binding IsWatchedTab}"
+                                        Command="{Binding SetTabCommand}" CommandParameter="watched">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="Watched" />
+                                        <TextBlock Text="{Binding WatchedCount}" Opacity="0.6" FontWeight="Medium" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="seg" Classes.active="{Binding IsPlannedTab}"
+                                        Command="{Binding SetTabCommand}" CommandParameter="planned">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="Planned" />
+                                        <TextBlock Text="{Binding PlannedCount}" Opacity="0.6" FontWeight="Medium" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <Button Grid.Column="3" Classes="primary" Command="{Binding OpenAddCommand}"
+                                VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <TextBlock Text="+" FontSize="16" />
+                                <TextBlock Text="Add title" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="4" Classes="themeToggle" Classes.light="{Binding IsLightTheme}"
+                                Command="{Binding ToggleThemeCommand}" Width="46" Height="26"
+                                Margin="14,0,0,0" VerticalAlignment="Center">
+                            <Border Name="Knob" Width="20" Height="20" CornerRadius="10"
+                                    Background="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <Grid ColumnDefinitions="Auto,Auto,Auto,*" Margin="28,12">
+                    <TextBox Grid.Column="0" Classes="field" Width="420"
+                             PlaceholderText="Search your library…" Text="{Binding SearchText}" />
+
+                    <Border Grid.Column="1" Margin="14,0,0,0" Background="{DynamicResource Surface2Brush}"
+                            CornerRadius="8" Padding="3" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <Button Classes="seg" Classes.active="{Binding IsSortRating}"
+                                    Command="{Binding SetSortCommand}" CommandParameter="rating" Content="Rating" />
+                            <Button Classes="seg" Classes.active="{Binding IsSortName}"
+                                    Command="{Binding SetSortCommand}" CommandParameter="name" Content="Name" />
+                            <Button Classes="seg" Classes.active="{Binding IsSortRecent}"
+                                    Command="{Binding SetSortCommand}" CommandParameter="recent" Content="Recent" />
+                        </StackPanel>
+                    </Border>
+
+                    <ComboBox Grid.Column="2" Margin="14,0,0,0" MinWidth="150" VerticalAlignment="Center"
+                              ItemsSource="{Binding GenreOptions}"
+                              SelectedItem="{Binding GenreFilter}" />
+
+                    <TextBlock Grid.Column="3" Text="{Binding ResultCountLabel}" HorizontalAlignment="Right"
+                               VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}" FontSize="12.5" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Panel Grid.Row="1">
+            <ListBox Classes="tiles" ItemsSource="{Binding FilteredTitles}"
+                     SelectedItem="{Binding GridSelection}" SelectionMode="Single"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TitleViewModel">
+                        <Border Background="{Binding PosterBrush}" CornerRadius="12" ClipToBounds="True">
+                            <Panel>
+                                <Border Background="#8C000000" CornerRadius="5" Padding="7,3"
+                                        HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8">
+                                    <TextBlock Text="{Binding TypeLabel}" Foreground="White"
+                                               FontSize="9.5" FontWeight="Bold" />
+                                </Border>
+                                <Border VerticalAlignment="Bottom" Padding="10,22,10,10">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0%,100%" EndPoint="0%,0%">
+                                            <GradientStop Color="#E0000000" Offset="0" />
+                                            <GradientStop Color="#00000000" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding Name}" Foreground="White" FontSize="13"
+                                                   FontWeight="SemiBold" TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding Year}" Foreground="#99FFFFFF" FontSize="10.5" />
+                                    </StackPanel>
+                                </Border>
+                            </Panel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="No titles match your search." IsVisible="{Binding NoResults}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextFaintBrush}" FontSize="14" />
+        </Panel>
+
+        <Border Grid.Row="2" Height="190" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="28,18">
+
+            <TextBlock Text="Select a title to see details" IsVisible="{Binding !HasSelection}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextFaintBrush}" FontSize="13.5" />
+
+            <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding HasSelection}">
+
+                <Border Grid.Column="0" Width="104" Height="154" CornerRadius="10" ClipToBounds="True"
+                        Background="{Binding SelectedTitle.PosterBrush}" VerticalAlignment="Center">
+                    <Border Background="#8C000000" CornerRadius="4" Padding="6,2"
+                            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="6">
+                        <TextBlock Text="{Binding SelectedTitle.TypeLabel}" Foreground="White"
+                                   FontSize="8.5" FontWeight="Bold" />
+                    </Border>
+                </Border>
+
+                <StackPanel Grid.Column="1" Margin="26,0" VerticalAlignment="Center" Spacing="10">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{Binding SelectedTitle.Name}" FontSize="22" FontWeight="Bold" />
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="{Binding SelectedTitle.Year}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
+                            <TextBlock Text="·" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
+                            <TextBlock Text="{Binding SelectedTitle.TypeFull}" Foreground="{DynamicResource TextMutedBrush}" FontSize="13" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SelectedTitle.RatingText}" FontSize="26" FontWeight="Bold"
+                                   Foreground="{DynamicResource AccentBrush}" />
+                        <TextBlock Text="/ 10.0" FontSize="13" Foreground="{DynamicResource TextFaintBrush}"
+                                   VerticalAlignment="Bottom" Margin="0,0,0,4" />
+                        <Border Width="120" Height="5" CornerRadius="3" Margin="8,0,0,0"
+                                Background="{DynamicResource Surface2Brush}" ClipToBounds="True" VerticalAlignment="Center">
+                            <Border HorizontalAlignment="Left" Width="{Binding SelectedTitle.RatingBarWidth}"
+                                    CornerRadius="3" Background="{DynamicResource AccentBrush}" />
+                        </Border>
+                    </StackPanel>
+
+                    <ItemsControl ItemsSource="{Binding SelectedTitle.Genres}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="chip" Margin="0,0,8,0">
+                                    <TextBlock Text="{Binding}" Foreground="{DynamicResource TextMutedBrush}"
+                                               FontSize="11.5" FontWeight="Medium" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="8">
+                    <Border Background="{DynamicResource Surface2Brush}" CornerRadius="9" Padding="3">
+                        <StackPanel Orientation="Horizontal" Spacing="2">
+                            <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsWatched}"
+                                    Command="{Binding SetStatusCommand}" CommandParameter="watched" Content="Watched" />
+                            <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsPlanned}"
+                                    Command="{Binding SetStatusCommand}" CommandParameter="planned" Content="Planned" />
+                            <Button Classes="seg" IsEnabled="False" Opacity="0.5" Content="Dropped"
+                                    ToolTip.Tip="Coming soon" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="Dropped status — coming soon" HorizontalAlignment="Right"
+                               Foreground="{DynamicResource TextFaintBrush}" FontSize="11" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#99000000" IsVisible="{Binding ShowAdd}">
+            <Border Width="420" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14"
+                    Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="Add title" FontSize="18" FontWeight="Bold" />
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Name" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBox Classes="field" PlaceholderText="e.g. The Batman" Text="{Binding DraftName}" />
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,12,0">
+                            <TextBlock Text="Type" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                            <Border Background="{DynamicResource Surface2Brush}" CornerRadius="8" Padding="3">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Classes="seg" Classes.active="{Binding IsDraftMovie}"
+                                            Command="{Binding SetDraftTypeCommand}" CommandParameter="movie" Content="Movie" />
+                                    <Button Classes="seg" Classes.active="{Binding IsDraftTv}"
+                                            Command="{Binding SetDraftTypeCommand}" CommandParameter="tv" Content="TV" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Width="110" Spacing="6">
+                            <TextBlock Text="Rating" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                            <TextBox Classes="field" PlaceholderText="0–10" Text="{Binding DraftRating}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Genres (comma separated)" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <TextBox Classes="field" PlaceholderText="Drama, Thriller" Text="{Binding DraftGenres}" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Status" FontSize="12" Foreground="{DynamicResource TextMutedBrush}" />
+                        <Border Background="{DynamicResource Surface2Brush}" CornerRadius="8" Padding="3">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Classes="seg" Classes.active="{Binding IsDraftWatched}"
+                                        Command="{Binding SetDraftStatusCommand}" CommandParameter="watched" Content="Watched" />
+                                <Button Classes="seg" Classes.active="{Binding IsDraftPlanned}"
+                                        Command="{Binding SetDraftStatusCommand}" CommandParameter="planned" Content="Planned" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,6,0,0">
+                        <Button Classes="ghost" Command="{Binding CloseAddCommand}" Content="Cancel" />
+                        <Button Classes="primary" Command="{Binding SubmitAddCommand}" Content="Add to library" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
 </Window>
