@@ -127,7 +127,11 @@ public partial class MainWindowViewModel : ViewModelBase
         if (GridSelection is null) return;
 
         var newStatus = status == "watched" ? WatchStatus.Watched : WatchStatus.Planned;
+        DateTime? watchedAt = newStatus == WatchStatus.Watched ? DateTime.Now : null;
+
         GridSelection.Status = newStatus;
+        GridSelection.Model.Status = newStatus;
+        GridSelection.Model.DateWatched = watchedAt;
 
         using (var db = new VidendaContext())
         {
@@ -135,13 +139,12 @@ public partial class MainWindowViewModel : ViewModelBase
             if (dbTitle is not null)
             {
                 dbTitle.Status = newStatus;
+                dbTitle.DateWatched = watchedAt;
                 db.SaveChanges();
             }
         }
 
-        GridSelection.Model.Status = newStatus;
-        OnPropertyChanged(nameof(WatchedCount));
-        OnPropertyChanged(nameof(PlannedCount));
+        NotifyCounts();
         Refresh();
     }
 
@@ -213,31 +216,20 @@ public partial class MainWindowViewModel : ViewModelBase
         if (double.TryParse(DraftRating, out var r))
             rating = r;
 
-        // Genres aus Komma-Liste
-        var genreNames = DraftGenres
-            .Split(',')
-            .Select(g => g.Trim())
-            .Where(g => g.Length > 0)
-            .ToList();
+        var status = DraftStatus == "watched" ? WatchStatus.Watched : WatchStatus.Planned;
 
         var title = new Title
         {
             Name = DraftName.Trim(),
             Type = DraftType == "tv" ? TitleType.Tv : TitleType.Movie,
-            Status = DraftStatus == "watched" ? WatchStatus.Watched : WatchStatus.Planned,
+            Status = status,
+            DateWatched = status == WatchStatus.Watched ? DateTime.Now : null,
             Rating = rating
         };
 
         using (var db = new VidendaContext())
         {
-            // Genres: existierende wiederverwenden, neue anlegen
-            foreach (var name in genreNames)
-            {
-                var genre = db.Genres.FirstOrDefault(g => g.Name == name)
-                            ?? new Genre { Name = name };
-                title.Genres.Add(genre);
-            }
-
+            AttachGenres(db, title, ParseGenres(DraftGenres));
             db.Titles.Add(title);
             db.SaveChanges();
         }
@@ -247,8 +239,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ShowAdd = false;
         RebuildGenreOptions();
-        OnPropertyChanged(nameof(WatchedCount));
-        OnPropertyChanged(nameof(PlannedCount));
+        NotifyCounts();
 
         // Zum passenden Tab wechseln und neuen Titel auswählen
         CurrentTab = title.Status == WatchStatus.Watched ? "watched" : "planned";
@@ -325,30 +316,21 @@ public partial class MainWindowViewModel : ViewModelBase
 
             var coverPath = await MetadataService.DownloadPosterAsync(meta.Poster, imdbId);
 
-            var genreNames = (meta.Genre ?? string.Empty)
-                .Split(',')
-                .Select(g => g.Trim())
-                .Where(g => g.Length > 0)
-                .ToList();
+            var status = ImportStatus == "watched" ? WatchStatus.Watched : WatchStatus.Planned;
 
             var title = new Title
             {
                 Name = meta.Title ?? imdbId,
                 Year = MetadataService.ParseYear(meta.Year),
                 Type = meta.Type == "series" ? TitleType.Tv : TitleType.Movie,
-                Status = ImportStatus == "watched" ? WatchStatus.Watched : WatchStatus.Planned,
+                Status = status,
+                DateWatched = status == WatchStatus.Watched ? DateTime.Now : null,
                 CoverPath = coverPath
             };
 
             using (var db = new VidendaContext())
             {
-                foreach (var name in genreNames)
-                {
-                    var genre = db.Genres.FirstOrDefault(g => g.Name == name)
-                                ?? new Genre { Name = name };
-                    title.Genres.Add(genre);
-                }
-
+                AttachGenres(db, title, ParseGenres(meta.Genre ?? string.Empty));
                 db.Titles.Add(title);
                 db.SaveChanges();
             }
@@ -357,8 +339,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             ShowImport = false;
             RebuildGenreOptions();
-            OnPropertyChanged(nameof(WatchedCount));
-            OnPropertyChanged(nameof(PlannedCount));
+            NotifyCounts();
 
             CurrentTab = title.Status == WatchStatus.Watched ? "watched" : "planned";
             Refresh();
@@ -424,11 +405,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 System.Globalization.CultureInfo.InvariantCulture, out var r))
             rating = Math.Clamp(r, 0, 10);
 
-        var genreNames = EditGenres
-            .Split(',')
-            .Select(g => g.Trim())
-            .Where(g => g.Length > 0)
-            .ToList();
+        var genreNames = ParseGenres(EditGenres);
 
         var model = GridSelection.Model;
 
@@ -443,14 +420,9 @@ public partial class MainWindowViewModel : ViewModelBase
             dbTitle.Year = year;
             dbTitle.Rating = rating;
 
-            // Genres komplett ersetzen: vorhandene wiederverwenden, neue anlegen
+            // Genres komplett ersetzen
             dbTitle.Genres.Clear();
-            foreach (var name in genreNames)
-            {
-                var genre = db.Genres.FirstOrDefault(g => g.Name == name)
-                            ?? new Genre { Name = name };
-                dbTitle.Genres.Add(genre);
-            }
+            AttachGenres(db, dbTitle, genreNames);
 
             db.SaveChanges();
 
@@ -466,6 +438,32 @@ public partial class MainWindowViewModel : ViewModelBase
         ShowEdit = false;
         RebuildGenreOptions();
         Refresh();
+    }
+
+    // ==================== HILFSFUNKTIONEN ====================
+
+    private void NotifyCounts()
+    {
+        OnPropertyChanged(nameof(WatchedCount));
+        OnPropertyChanged(nameof(PlannedCount));
+    }
+
+    private static List<string> ParseGenres(string input) =>
+        input.Split(',')
+            .Select(g => g.Trim())
+            .Where(g => g.Length > 0)
+            .Distinct()
+            .ToList();
+
+    // Existierende Genres wiederverwenden, neue anlegen
+    private static void AttachGenres(VidendaContext db, Title title, List<string> names)
+    {
+        foreach (var name in names)
+        {
+            var genre = db.Genres.FirstOrDefault(g => g.Name == name)
+                        ?? new Genre { Name = name };
+            title.Genres.Add(genre);
+        }
     }
 
     // ==================== DATEN LADEN / FILTERN ====================

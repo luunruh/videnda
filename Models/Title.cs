@@ -12,7 +12,7 @@ public class Title
     public WatchStatus Status { get; set; } = WatchStatus.Planned;
 
     public double? Rating { get; set; }      // 0–10.0, optional
-    public string? CoverPath { get; set; }   // für später
+    public string? CoverPath { get; set; }   // lokaler Pfad, ~/.config/Videnda/covers/
     public string? Notes { get; set; }
 
     public DateTime DateAdded { get; set; } = DateTime.Now;
