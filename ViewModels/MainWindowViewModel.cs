@@ -89,6 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         OnPropertyChanged(nameof(SelectedTitle));
         OnPropertyChanged(nameof(HasSelection));
+        OnPropertyChanged(nameof(DeletePrompt));
     }
 
     // --- Theme ---
@@ -486,6 +487,56 @@ public partial class MainWindowViewModel : ViewModelBase
 
         ShowEdit = false;
         RebuildGenreOptions();
+        Refresh();
+    }
+
+    // ==================== DELETE-MODAL ====================
+
+    [ObservableProperty]
+    public partial bool ShowDelete { get; set; }
+
+    public string DeletePrompt => GridSelection is null
+        ? string.Empty
+        : $"Delete “{GridSelection.Name}” from your library?";
+
+    [RelayCommand]
+    private void OpenDelete()
+    {
+        if (GridSelection is null) return;
+        ShowDelete = true;
+    }
+
+    [RelayCommand]
+    private void CloseDelete() => ShowDelete = false;
+
+    [RelayCommand]
+    private void ConfirmDelete()
+    {
+        if (GridSelection is null) return;
+
+        var id = GridSelection.Model.Id;
+
+        using (var db = new VidendaContext())
+        {
+            var dbTitle = db.Titles.Find(id);
+            if (dbTitle is not null)
+            {
+                // Die Genre-Verknüpfungen räumt EF über die Join-Tabelle mit ab.
+                // Die Genres selbst bleiben stehen, sie hängen ggf. an anderen Titeln.
+                db.Titles.Remove(dbTitle);
+                db.SaveChanges();
+            }
+        }
+
+        // Die Cover-Datei bleibt absichtlich liegen: wird derselbe Film zweimal
+        // importiert, zeigen beide Einträge auf denselben Pfad — Löschen würde
+        // dem verbleibenden Eintrag das Bild wegnehmen.
+        _all.RemoveAll(t => t.Model.Id == id);
+
+        ShowDelete = false;
+        GridSelection = null;
+        RebuildGenreOptions();
+        NotifyCounts();
         Refresh();
     }
 

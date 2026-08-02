@@ -72,6 +72,35 @@
             <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
         </Style>
 
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#E5484D" />
+            <Setter Property="BorderBrush" Value="#59E5484D" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.danger:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#1FE5484D" />
+            <Setter Property="TextBlock.Foreground" Value="#E5484D" />
+        </Style>
+
+        <Style Selector="Button.dangerFilled">
+            <Setter Property="Background" Value="#E5484D" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="16,9" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="FontSize" Value="13.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+        <Style Selector="Button.dangerFilled:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#CF3D42" />
+            <Setter Property="TextBlock.Foreground" Value="White" />
+        </Style>
+
         <Style Selector="Button.themeToggle">
             <Setter Property="Background" Value="{DynamicResource Surface2Brush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
@@ -342,8 +371,10 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Spacing="8">
-                        <Button Classes="ghost" Command="{Binding OpenEditCommand}" Content="Edit"
-                                HorizontalAlignment="Right" />
+                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                            <Button Classes="ghost" Command="{Binding OpenEditCommand}" Content="Edit" />
+                            <Button Classes="danger" Command="{Binding OpenDeleteCommand}" Content="Delete" />
+                        </StackPanel>
                         <Border Background="{DynamicResource Surface2Brush}" CornerRadius="9" Padding="3">
                             <StackPanel Orientation="Horizontal" Spacing="2">
                                 <Button Classes="seg" Classes.active="{Binding SelectedTitle.IsWatched}"
@@ -488,6 +519,28 @@
                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,6,0,0">
                         <Button Classes="ghost" Command="{Binding CloseEditCommand}" Content="Cancel" />
                         <Button Classes="primary" Command="{Binding SubmitEditCommand}" Content="Save" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#99000000" IsVisible="{Binding ShowDelete}">
+            <Border Width="380" Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14"
+                    Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Delete title" FontSize="18" FontWeight="Bold" />
+
+                    <TextBlock Text="{Binding DeletePrompt}" FontSize="13.5" TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+
+                    <TextBlock Text="This removes it from your library permanently and cannot be undone."
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextFaintBrush}" />
+
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,6,0,0">
+                        <Button Classes="ghost" Command="{Binding CloseDeleteCommand}" Content="Cancel" />
+                        <Button Classes="dangerFilled" Command="{Binding ConfirmDeleteCommand}" Content="Delete" />
                     </StackPanel>
                 </StackPanel>
             </Border>
