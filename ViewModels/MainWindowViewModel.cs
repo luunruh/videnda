@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input.Platform;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -147,6 +149,53 @@ public partial class MainWindowViewModel : ViewModelBase
         NotifyCounts();
         Refresh();
     }
+
+    // ==================== LISTE KOPIEREN ====================
+
+    // Kurzes "Copied ✓"-Feedback am Button
+    [ObservableProperty]
+    public partial bool JustCopied { get; set; }
+
+    public string CopyListLabel => JustCopied ? "Copied ✓" : "Copy list";
+
+    partial void OnJustCopiedChanged(bool value) => OnPropertyChanged(nameof(CopyListLabel));
+
+    // Kopiert genau das, was gerade angezeigt wird (Tab + Suche + Genre-Filter + Sortierung)
+    [RelayCommand]
+    private async Task CopyListAsync()
+    {
+        if (FilteredTitles.Count == 0) return;
+
+        var clipboard = GetClipboard();
+        if (clipboard is null) return;
+
+        var text = string.Join(Environment.NewLine, FilteredTitles.Select(FormatForClipboard));
+        await clipboard.SetTextAsync(text);
+
+        JustCopied = true;
+        await Task.Delay(1500);
+        JustCopied = false;
+    }
+
+    // "The Batman (2022) — 8.5", Jahr und Rating jeweils nur wenn vorhanden
+    private static string FormatForClipboard(TitleViewModel t)
+    {
+        var line = t.Name;
+
+        if (t.Model.Year is { } year)
+            line += $" ({year})";
+
+        if (t.Model.Rating is { } rating)
+            line += $" — {rating.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}";
+
+        return line;
+    }
+
+    private static IClipboard? GetClipboard() =>
+        Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            ? desktop.MainWindow?.Clipboard
+            : null;
+
 
     // ==================== ADD-MODAL ====================
 

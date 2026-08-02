@@ -203,7 +203,7 @@
                     </Grid>
                 </Border>
 
-                <Grid ColumnDefinitions="Auto,Auto,Auto,*" Margin="28,12">
+                <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" Margin="28,12">
                     <TextBox Grid.Column="0" Classes="field" Width="420"
                              PlaceholderText="Search your library…" Text="{Binding SearchText}" />
 
@@ -225,6 +225,12 @@
 
                     <TextBlock Grid.Column="3" Text="{Binding ResultCountLabel}" HorizontalAlignment="Right"
                                VerticalAlignment="Center" Foreground="{DynamicResource TextFaintBrush}" FontSize="12.5" />
+
+                    <Button Grid.Column="4" Classes="ghost" Margin="14,0,0,0" VerticalAlignment="Center"
+                            MinWidth="112" HorizontalContentAlignment="Center"
+                            Command="{Binding CopyListCommand}" Content="{Binding CopyListLabel}"
+                            IsEnabled="{Binding !NoResults}"
+                            ToolTip.Tip="Copy the visible titles to the clipboard" />
                 </Grid>
             </StackPanel>
         </Border>
